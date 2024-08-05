@@ -25,17 +25,17 @@ app.get('/', (req, res) => {
 });
 
 app.post('/report-bug', async (req, res) => {
-  const { name, email, description } = req.body;
+  const { name, description2, description, gestAgeTotalDays, birthWeight, dateOfBirth } = req.body;
 
-  console.log(`Received bug report: ${name}, ${email}, ${description}`);
+  console.log(`Received bug report: ${name}, ${description2}, ${description}, ${gestAgeTotalDays}, ${birthWeight}, ${dateOfBirth}`);
 
   try {
     const response = await sheets.spreadsheets.values.append({
       spreadsheetId: SPREADSHEET_ID,
-      range: 'Sheet1!A:C', // Adjust the range as needed
+      range: 'Sheet1!A:F', // Adjust the range as needed
       valueInputOption: 'USER_ENTERED',
       resource: {
-        values: [[name, email, description]],
+        values: [[name, description2, description, gestAgeTotalDays, birthWeight, dateOfBirth]],
       },
     });
 
