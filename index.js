@@ -5,9 +5,9 @@ const { google } = require('googleapis');
 
 const app = express();
 app.use(bodyParser.json());
-app.use(cors()); // Enable CORS
+app.use(cors());
 
-// Load service account credentials from environment variable
+
 const credentials = JSON.parse(process.env.GOOGLE_CREDENTIALS);
 
 const auth = new google.auth.GoogleAuth({
@@ -17,7 +17,7 @@ const auth = new google.auth.GoogleAuth({
 
 const sheets = google.sheets({ version: 'v4', auth });
 
-// Replace with your actual Google Sheet ID
+
 const SPREADSHEET_ID = '1YOJ4FMBPXmi17RvBc0hiKrlSwogHApuQV1rGrNiVlfA';
 
 app.get('/', (req, res) => {
@@ -27,15 +27,21 @@ app.get('/', (req, res) => {
 app.post('/report-bug', async (req, res) => {
   const { name, description2, description, gestAgeTotalDays, birthWeight, dateOfBirth } = req.body;
 
+  function convertDaysToWeeks(days) {
+    const weeks = Math.floor(days / 7);
+    const remainingDays = days % 7;
+    return `${weeks} wk + ${remainingDays} d`;
+}
+  
   console.log(`Received bug report: ${name}, ${description2}, ${description}, ${gestAgeTotalDays}, ${birthWeight}, ${dateOfBirth}`);
 
   try {
     const response = await sheets.spreadsheets.values.append({
       spreadsheetId: SPREADSHEET_ID,
-      range: 'Sheet1!A:F', // Adjust the range as needed
+      range: 'Sheet1!A:F', 
       valueInputOption: 'USER_ENTERED',
       resource: {
-        values: [[name, description2, description, gestAgeTotalDays, birthWeight, dateOfBirth]],
+        values: [[name, description2, description, convertDaysToWeeks(gestAgeTotalDays), birthWeight, dateOfBirth]],
       },
     });
 
